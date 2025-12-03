@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Alert</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --apple-blue: #007AFF;
+            --microsoft-blue: #0078D4;
+            --warning-red: #FF3B30;
+            --microsoft-red: #D13438;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, Roboto, 'Segoe UI', sans-serif;
+        }
+        
+        body {
+            background-color: #000;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* iPhone Device Frame */
+        .iphone-device {
+            display: none;
+            width: 100%;
+            max-width: 390px;
+            height: auto;
+            min-height: 700px;
+            background: #111;
+            border-radius: 50px;
+            padding: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8),
+                        inset 0 0 0 2px rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .iphone-screen {
+            width: 100%;
+            height: 100%;
+            min-height: 670px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 40px;
+            overflow: hidden;
+            position: relative;
+            background-image: url('https://images.unsplash.com/photo-1593640408182-31c70c8268f5?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+        }
+        
+        /* Windows/Android/Desktop Device Frame */
+        .windows-device {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+            height: auto;
+            min-height: 600px;
+            background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .windows-screen {
+            width: 100%;
+            height: 100%;
+            min-height: 560px;
+            background-color: #f3f2f1;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            background-image: url('https://images.unsplash.com/photo-1542751110-97427bbecf20?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Status Bars */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 25px;
+            color: #000;
+            font-size: 14px;
+            font-weight: 600;
+            height: 44px;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+        }
+        
+        .windows-taskbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #fff;
+            font-size: 14px;
+            height: 40px;
+        }
+        
+        .time {
+            font-weight: 700;
+        }
+        
+        .status-icons {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        /* Alert Popups */
+        .alert-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            padding: 20px;
+        }
+        
+        .apple-alert {
+            background-color: #ffffff;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 320px;
+            width: 100%;
+        }
+        
+        .windows-alert {
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid #d2d0ce;
+        }
+        
+        @keyframes popIn {
+            from { 
+                transform: scale(0.9) translateY(20px); 
+                opacity: 0; 
+            }
+            to { 
+                transform: scale(1) translateY(0); 
+                opacity: 1; 
+            }
+        }
+        
+        /* Alert Headers */
+        .apple-header {
+            background-color: #f5f5f7;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #e5e5e7;
+        }
+        
+        .windows-header {
+            background: linear-gradient(to right, #0078d4, #005a9e);
+            padding: 20px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            border-bottom: 1px solid #d2d0ce;
+        }
+        
+        .apple-logo {
+            font-size: 28px;
+            margin-bottom: 8px;
+            color: #000;
+        }
+        
+        .windows-logo {
+            font-size: 28px;
+            color: white;
+        }
+        
+        .alert-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #000;
+            margin-bottom: 5px;
+        }
+        
+        .windows-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .alert-subtitle {
+            font-size: 16px;
+            color: #000;
+            font-weight: 500;
+        }
+        
+        .windows-subtitle {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+        }
+        
+        /* Alert Content */
+        .alert-content {
+            padding: 20px;
+            color: #000;
+        }
+        
+        .alert-message {
+            font-size: 15px;
+            line-height: 1.5;
+            color: #000;
+            margin-bottom: 20px;
+        }
+        
+        .alert-id {
+            background-color: #f5f5f7;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+            color: #000;
+            border-left: 4px solid var(--apple-blue);
+        }
+        
+        .windows-id {
+            background-color: #f3f2f1;
+            padding: 12px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-size: 14px;
+            color: #000;
+            border-left: 4px solid var(--microsoft-blue);
+        }
+        
+        .transaction-box {
+            background-color: #f8f8fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--warning-red);
+        }
+        
+        .windows-transaction {
+            background-color: #f3f2f1;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            border-left: 4px solid var(--microsoft-red);
+        }
+        
+        /* Alert Footers */
+        .alert-footer {
+            padding: 20px;
+            border-top: 1px solid #e5e5e7;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .windows-footer {
+            padding: 20px;
+            border-top: 1px solid #d2d0ce;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            background-color: #faf9f8;
+        }
+        
+        .alert-button {
+            padding: 16px;
+            text-align: center;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 17px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        
+        .windows-button {
+            padding: 12px 28px;
+            text-align: center;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        
+        .primary-btn {
+            background-color: var(--apple-blue);
+            color: white;
+        }
+        
+        .windows-primary {
+            background-color: var(--microsoft-blue);
+            color: white;
+        }
+        
+        .secondary-btn {
+            background-color: #e5e5e7;
+            color: var(--apple-blue);
+        }
+        
+        .windows-secondary {
+            background-color: #f3f2f1;
+            color: #323130;
+            border: 1px solid #8a8886;
+        }
+        
+        .primary-btn:hover, .windows-primary:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+        
+        .secondary-btn:hover, .windows-secondary:hover {
+            background-color: #d1d1d6;
+        }
+        
+        /* Device Notch and Indicators */
+        .device-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 30px;
+            background-color: #111;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            z-index: 10;
+        }
+        
+        .home-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 5px;
+            background-color: #000;
+            border-radius: 3px;
+            opacity: 0.3;
+        }
+        
+        /* Icons */
+        .warning-icon {
+            color: var(--warning-red);
+            font-size: 20px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        .windows-warning {
+            color: var(--microsoft-red);
+            font-size: 20px;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+        
+        /* Instructions */
+        .instructions {
+            font-size: 12px;
+            color: #8e8e93;
+            text-align: center;
+            margin: 20px 20px 0;
+            padding: 20px 0 0;
+            line-height: 1.4;
+            border-top: 1px solid #e5e5e7;
+        }
+        
+        .windows-instructions {
+            font-size: 12px;
+            color: #605e5c;
+            text-align: left;
+            margin: 20px 20px 0;
+            padding: 20px 0 0;
+            line-height: 1.4;
+            border-top: 1px solid #d2d0ce;
+        }
+        
+        /* Device Detection Banner */
+        .device-banner {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            z-index: 1000;
+            max-width: 300px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+            display: none;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .iphone-device {
+                max-width: 350px;
+                border-radius: 40px;
+                padding: 12px;
+                min-height: 650px;
+            }
+            
+            .iphone-screen {
+                border-radius: 35px;
+                min-height: 625px;
+            }
+            
+            .windows-device {
+                max-width: 95%;
+                border-radius: 10px;
+                padding: 15px;
+                min-height: 550px;
+            }
+            
+            .windows-screen {
+                min-height: 520px;
+            }
+            
+            .apple-alert, .windows-alert {
+                margin: 10px;
+            }
+            
+            .device-banner {
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                max-width: none;
+            }
+            
+            .windows-footer {
+                flex-direction: column;
+            }
+            
+            .windows-button {
+                width: 100%;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .iphone-device {
+                max-width: 320px;
+                border-radius: 35px;
+                padding: 10px;
+                min-height: 600px;
+            }
+            
+            .iphone-screen {
+                border-radius: 30px;
+                min-height: 580px;
+            }
+            
+            .device-notch {
+                width: 150px;
+                height: 25px;
+            }
+            
+            .alert-title, .windows-title {
+                font-size: 20px;
+            }
+            
+            .alert-message {
+                font-size: 14px;
+            }
+            
+            .alert-button {
+                padding: 14px;
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .iphone-device {
+                max-width: 300px;
+            }
+            
+            .status-bar {
+                padding: 10px 15px;
+                font-size: 13px;
+            }
+            
+            .alert-content {
+                padding: 15px;
+            }
+        }
+        
+        @media (min-width: 1200px) {
+            .iphone-device {
+                max-width: 410px;
+            }
+            
+            .windows-device {
+                max-width: 850px;
+            }
+        }
+        
+        /* Show active device */
+        .active {
+            display: block !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- Device Detection Banner -->
+    <div class="device-banner" id="deviceBanner">
+        Detected Device: <span id="deviceType">Checking...</span>
+    </div>
+    
+    <div class="container">
+        <!-- iPhone Device -->
+        <div class="iphone-device" id="iphoneDevice">
+            <div class="device-notch"></div>
+            <div class="iphone-screen">
+                <div class="status-bar">
+                    <div class="time">9:41</div>
+                    <div class="status-icons">
+                        <i class="fas fa-signal"></i>
+                        <i class="fas fa-wifi"></i>
+                        <i class="fas fa-battery-three-quarters"></i>
+                    </div>
+                </div>
+                
+                <div class="alert-overlay">
+                    <div class="apple-alert">
+                        <div class="apple-header">
+                            <div class="apple-logo">
+                                <i class="fab fa-apple"></i>
+                            </div>
+                            <div class="alert-title">Apple Security Alert</div>
+                            <div class="alert-subtitle">Important Security Notice</div>
+                        </div>
+                        
+                        <div class="alert-content">
+                            <p class="alert-message">
+                                <i class="fas fa-exclamation-triangle warning-icon"></i>
+                                We have noticed unusual activity on your Apple ID (Case ID: <strong>10215467944</strong>), including a pending $449.98 transaction at the "APPLE STORE – Orlando" via Apple Pay Pre-Authorization.
+                            </p>
+                            
+                            <div class="alert-id">
+                                <strong>Case ID:</strong> 10215467944
+                            </div>
+                            
+                            <div class="transaction-box">
+                                <strong>Transaction Amount:</strong> $449.98<br>
+                                <strong>Merchant:</strong> APPLE STORE – Orlando<br>
+                                <strong>Payment Method:</strong> Apple Pay Pre-Authorization
+                            </div>
+                            
+                            <p class="alert-message">
+                                There have been multiple unauthorized sign-in attempts and Apple Pay activation requests from unfamiliar locations. To protect your account we've temporarily blocked these actions and placed the transaction on hold as a precaution.
+                            </p>
+                            
+                            <p class="alert-message">
+                                If this was you, no further action is required, and the transaction will be processed automatically within 24 hours. However, if you do not recognize this activity, please contact Apple Support immediately at <strong>(888) *-***45</strong>.
+                            </p>
+                        </div>
+                        
+                        <div class="alert-footer">
+                            <button class="alert-button primary-btn" id="appleCallBtn">
+                                Call Apple Support
+                            </button>
+                            <button class="alert-button secondary-btn" id="appleDismissBtn">
+                                Dismiss
+                            </button>
+                        </div>
+                        
+                        <div class="instructions">
+                            To verify this alert, go to Settings > [Your Name] > Password & Security on your Apple device.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="home-indicator"></div>
+            </div>
+        </div>
+        
+        <!-- Windows/Android/Desktop Device -->
+        <div class="windows-device" id="windowsDevice">
+            <div class="windows-screen">
+                <div class="windows-taskbar">
+                    <div class="windows-start">
+                        <i class="fab fa-windows"></i>
+                    </div>
+                    <div class="time">9:41 AM</div>
+                    <div class="status-icons">
+                        <i class="fas fa-wifi"></i>
+                        <i class="fas fa-volume-up"></i>
+                        <i class="fas fa-battery-full"></i>
+                    </div>
+                </div>
+                
+                <div class="alert-overlay">
+                    <div class="windows-alert">
+                        <div class="windows-header">
+                            <div class="windows-logo">
+                                <i class="fab fa-windows"></i>
+                            </div>
+                            <div>
+                                <div class="windows-title">Microsoft Security Alert</div>
+                                <div class="windows-subtitle">Windows Security Center</div>
+                            </div>
+                        </div>
+                        
+                        <div class="alert-content">
+                            <p class="alert-message">
+                                <i class="fas fa-exclamation-triangle windows-warning"></i>
+                                We have detected unusual activity on your Microsoft Account (Case ID: <strong>10215467944</strong>), including a pending $449.98 transaction at the "Microsoft Store – Orlando" via Microsoft Pay Pre-Authorization.
+                            </p>
+                            
+                            <div class="windows-id">
+                                <strong>Case ID:</strong> 10215467944
+                            </div>
+                            
+                            <div class="windows-transaction">
+                                <strong>Transaction Amount:</strong> $449.98<br>
+                                <strong>Merchant:</strong> Microsoft Store – Orlando<br>
+                                <strong>Payment Method:</strong> Microsoft Pay Pre-Authorization
+                            </div>
+                            
+                            <p class="alert-message">
+                                There have been multiple unauthorized sign-in attempts and Microsoft Pay activation requests from unfamiliar locations. To protect your account we've temporarily blocked these actions and placed the transaction on hold as a precaution.
+                            </p>
+                            
+                            <p class="alert-message">
+                                If this was you, no further action is required, and the transaction will be processed automatically within 24 hours. However, if you do not recognize this activity, please contact Microsoft Support immediately at <strong>(888) *-***45</strong>.
+                            </p>
+                        </div>
+                        
+                        <div class="windows-footer">
+                            <button class="windows-button windows-secondary" id="windowsDismissBtn">
+                                Dismiss
+                            </button>
+                            <button class="windows-button windows-primary" id="windowsCallBtn">
+                                Contact Microsoft Support
+                            </button>
+                        </div>
+                        
+                        <div class="windows-instructions">
+                            To verify this alert, go to Settings > Accounts > Your info > Manage my Microsoft account.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Advanced device detection
+        function detectDevice() {
+            const userAgent = navigator.userAgent;
+            const banner = document.getElementById('deviceBanner');
+            const deviceTypeElement = document.getElementById('deviceType');
+            const iphoneDevice = document.getElementById('iphoneDevice');
+            const windowsDevice = document.getElementById('windowsDevice');
+            
+            let device = 'desktop';
+            let deviceName = 'Computer';
+            
+            // More accurate iOS detection
+            const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+            
+            // More accurate Android detection
+            const isAndroid = /Android/.test(userAgent);
+            
+            // Windows detection
+            const isWindows = /Windows/.test(userAgent);
+            
+            // Mac detection
+            const isMac = /Macintosh|MacIntel|MacPPC|Mac68K/.test(userAgent);
+            
+            // Linux detection
+            const isLinux = /Linux/.test(userAgent);
+            
+            // Mobile detection
+            const isMobile = /Mobi|Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+            
+            // Tablet detection
+            const isTablet = /Tablet|iPad|PlayBook|Silk/.test(userAgent);
+            
+            // Determine device type
+            if (isIOS) {
+                device = 'iphone';
+                deviceName = isTablet ? 'iPad' : 'iPhone';
+            } else if (isAndroid) {
+                device = 'android';
+                deviceName = isTablet ? 'Android Tablet' : 'Android Phone';
+            } else if (isWindows) {
+                device = 'windows';
+                deviceName = 'Windows PC';
+            } else if (isMac) {
+                device = 'mac';
+                deviceName = 'Mac Computer';
+            } else if (isLinux) {
+                device = 'linux';
+                deviceName = 'Linux Computer';
+            }
+            
+            // Show appropriate device
+            if (device === 'iphone') {
+                iphoneDevice.classList.add('active');
+                windowsDevice.classList.remove('active');
+            } else {
+                windowsDevice.classList.add('active');
+                iphoneDevice.classList.remove('active');
+            }
+            
+            // Update banner
+            deviceTypeElement.textContent = deviceName;
+            banner.style.display = 'block';
+            banner.style.background = device === 'iphone' 
+                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
+                : 'linear-gradient(135deg, #0078d4 0%, #005a9e 100%)';
+            
+            // Hide banner after 5 seconds
+            setTimeout(() => {
+                banner.style.display = 'none';
+            }, 5000);
+            
+            console.log('Device Detection Results:');
+            console.log('User Agent:', userAgent);
+            console.log('Detected Device:', device);
+            console.log('Device Name:', deviceName);
+            console.log('Is Mobile:', isMobile);
+            console.log('Is Tablet:', isTablet);
+            
+            return device;
+        }
+        
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            
+            // Format to 12-hour time for iPhone
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            
+            const timeString = hours + ':' + minutes;
+            const timeStringWithAMPM = hours + ':' + minutes + ' ' + ampm;
+            
+            // Update all time displays
+            document.querySelectorAll('.time').forEach(el => {
+                if (el.closest('.status-bar')) {
+                    el.textContent = timeString;
+                } else if (el.closest('.windows-taskbar')) {
+                    el.textContent = timeStringWithAMPM;
+                }
+            });
+        }
+        
+        // Initialize time
+        updateTime();
+        setInterval(updateTime, 30000); // Update every 30 seconds
+        
+        // Button event handlers
+        document.getElementById('appleCallBtn').addEventListener('click', function() {
+            alert("For security reasons, please contact Apple Support directly at 1-800-APL-CARE (1-800-275-2273)");
+        });
+        
+        document.getElementById('appleDismissBtn').addEventListener('click', function() {
+            alert("Alert dismissed. For your security, please verify your account activity in Settings > Apple ID.");
+        });
+        
+        document.getElementById('windowsCallBtn').addEventListener('click', function() {
+            alert("For security reasons, please contact Microsoft Support directly at 1-800-MICROSOFT (1-800-642-7676)");
+        });
+        
+        document.getElementById('windowsDismissBtn').addEventListener('click', function() {
+            alert("Alert dismissed. For your security, please verify your account activity in Settings > Accounts.");
+        });
+        
+        // Prevent dismissing by clicking outside
+        document.querySelectorAll('.alert-overlay').forEach(overlay => {
+            overlay.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.animation = 'none';
+                    void this.offsetWidth; // Trigger reflow
+                    this.style.animation = null;
+                }
+            });
+        });
+        
+        // Handle window resize
+        let resizeTimeout;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                detectDevice();
+            }, 250);
+        });
+        
+        // Initial detection on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            detectDevice();
+            
+            // Force a re-check after a short delay to ensure all assets are loaded
+            setTimeout(detectDevice, 1000);
+        });
+        
+        // Also detect on page load (in case DOMContentLoaded already fired)
+        window.addEventListener('load', detectDevice);
+    </script>
+</body>
+</html>
